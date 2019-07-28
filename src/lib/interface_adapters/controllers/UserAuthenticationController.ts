@@ -4,11 +4,13 @@ import {
     UserAuthentication
 } from "../../application_business_rules/use_cases/UserAuthentication";
 import {userRepository} from "../storage/UserRepositoryInMysql";
+import {UserLoginRequest} from "../serializers/UserLoginRequest";
 
 export async function login(req: Request, res: Response) {
-    const userAuthentication = await UserAuthentication(req.body,userRepository);
-    if(!userAuthentication.authenticated){
-        return BaseResponse.Fail(res,userAuthentication.errors)
+    const userLoginRequet = UserLoginRequest.serialize(req.body);
+    const userAuthentication = await UserAuthentication(userLoginRequet, userRepository);
+    if (!userAuthentication.authenticated) {
+        return BaseResponse.Fail(res, userAuthentication.errors)
     }
     return BaseResponse.Succeed(res, {token: userAuthentication.token})
 }

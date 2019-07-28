@@ -37,13 +37,13 @@ function generateToken(user: User) {
     });
 }
 
-interface UserLoginRequest {
+export interface IUserLoginRequest {
     username?: string;
     email?: string;
     password: string;
 }
 
-export async function UserAuthentication(userLoginRequest: UserLoginRequest,userRepository: IUserRepository) {
+export async function UserAuthentication(userLoginRequest: IUserLoginRequest,userRepository: IUserRepository) {
     const user = await userRepository.FindUserWithParams({[Op.or]: [{email: userLoginRequest.email}, {username: userLoginRequest.username}]});
     if (!user) {
         return {authenticated: false,token:null, errors: [getError("AUTH-001")]}
