@@ -30,7 +30,7 @@ function generateToken(user) {
     const payload = {};
     return JWT.sign(payload, key, {
         audience: ['urn:oxygen:client'],
-        issuer: 'https://op.oxygen.com',
+        issuer: 'https://gtw.oxygen.com',
         expiresIn: '10 hours',
         header: {
             typ: 'JWT'

@@ -1,7 +1,7 @@
 import {App, TemplatedApp} from "uWebSockets.js";
 import {createMessage, Message, validateMessage} from "./message";
 import {eventProcessor} from "./event_processor"
-import {ChangeUserStatus} from "../../interface_adapters/controllers/WebsocketUserStatusController";
+import {AuthenticateUserWS, ChangeUserStatus} from "../../interface_adapters/controllers/WebsocketUserStatusController";
 
 export default class uWsServer {
     public app: TemplatedApp;
@@ -16,8 +16,7 @@ export default class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                console.log('A WebSocket connected via URL: ' + req.getUrl() + '!');
-                ws.send("welcome", false)
+                AuthenticateUserWS(ws,req)
             },
             message: (ws, data, isBinary) => {
                 const message = JSON.parse(this.decoder.decode(data)) as Message;
@@ -27,6 +26,7 @@ export default class uWsServer {
                     ws.send(createMessage({success: false, error: "invalid body"}, 'InvalidMessage',"Failed").toString())
                 }
             },
+
             drain: (ws) => {
                 console.log('WebSocket backpressure: ' + ws.getBufferedAmount());
             },

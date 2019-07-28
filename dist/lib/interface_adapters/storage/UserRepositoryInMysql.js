@@ -31,5 +31,5 @@ class UserRepositoryInMysql {
         });
     }
 }
-exports.UserRepositoryInMysql = UserRepositoryInMysql;
+exports.userRepository = new UserRepositoryInMysql();
 //# sourceMappingURL=UserRepositoryInMysql.js.map

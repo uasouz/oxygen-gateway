@@ -12,14 +12,15 @@ const response_1 = require("../util/response");
 const ValidateUserSignUp_1 = require("../../application_business_rules/use_cases/ValidateUserSignUp");
 const CreateUser_1 = require("../../application_business_rules/use_cases/CreateUser");
 const UserRepositoryInMysql_1 = require("../storage/UserRepositoryInMysql");
-const userRepository = new UserRepositoryInMysql_1.UserRepositoryInMysql();
+const UserRegistration_1 = require("../serializers/UserRegistration");
 function registerUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userValidation = yield ValidateUserSignUp_1.ValidateUserSignUp({ userRegistration: req.body, errors: [], userRepository });
+        const userRegistration = UserRegistration_1.UserRegistration.serialize(req.body);
+        const userValidation = yield ValidateUserSignUp_1.ValidateUserSignUp({ userRegistration, errors: [], userRepository: UserRepositoryInMysql_1.userRepository });
         if (!userValidation.isValid) {
             return response_1.BaseResponse.Fail(res, userValidation.errors);
         }
-        yield userRepository.AddNewUser(CreateUser_1.CreateUser(req.body));
+        yield UserRepositoryInMysql_1.userRepository.AddNewUser(CreateUser_1.CreateUser(userRegistration));
         return response_1.BaseResponse.Succeed(res, {});
     });
 }

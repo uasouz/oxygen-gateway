@@ -1,8 +1,7 @@
 import * as bcrypt from "bcrypt";
-import {UserRegistration} from "./ValidateUserSignUp";
+import {IUserRegistration} from "./ValidateUserSignUp";
 
-
-export function CreateUser(userRegistration: UserRegistration) {
+export function CreateUser(userRegistration: IUserRegistration) {
     return {
         email: userRegistration.email,
         username: userRegistration.username,

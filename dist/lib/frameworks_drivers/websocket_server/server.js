@@ -15,8 +15,7 @@ class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                console.log('A WebSocket connected via URL: ' + req.getUrl() + '!');
-                ws.send("welcome", false);
+                WebsocketUserStatusController_1.AuthenticateUserWS(ws, req);
             },
             message: (ws, data, isBinary) => {
                 const message = JSON.parse(this.decoder.decode(data));
