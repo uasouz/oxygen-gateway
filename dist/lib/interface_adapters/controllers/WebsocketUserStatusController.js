@@ -19,6 +19,7 @@ function AuthenticateUserWS(ws, request) {
         return false;
     }
     ws.send(message_1.createMessage(null, "Welcome").toString());
+    return true;
 }
 exports.AuthenticateUserWS = AuthenticateUserWS;
 function ChangeUserStatus(ws, message) {

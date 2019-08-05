@@ -2,9 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const bodyParser = require("body-parser");
 const express = require("express");
-const winston = require("winston");
 // @ts-ignore
-const expressWinston = require("express-winston");
+const expresspino = require("express-pino-logger");
 const user_signup_1 = require("./user_signup");
 const user_authentication_1 = require("./user_authentication");
 class ExpressServer {
@@ -12,22 +11,7 @@ class ExpressServer {
         this.express = express();
         this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use(bodyParser.json());
-        this.express.use(expressWinston.logger({
-            transports: [
-                new winston.transports.Console()
-            ],
-            format: winston.format.combine(
-            // winston.format.colorize(),
-            winston.format.json()),
-            level: 'info',
-            meta: true,
-            msg: "HTTP {{req.method}} {{req.url}}",
-            expressFormat: true,
-            colorize: false,
-            ignoreRoute: function (req, res) {
-                return false;
-            } // optional: allows to skip some log messages based on request and/or response
-        }));
+        this.express.use(expresspino());
         this.express.use(function (req, res, next) {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Authorization, Content-Type, Accept");

@@ -14,15 +14,16 @@ const dotenv = require('dotenv');
 dotenv.config();
 const database_1 = require("./lib/frameworks_drivers/database");
 const server_2 = require("./lib/frameworks_drivers/websocket_server/server");
+const logger_1 = require("./lib/frameworks_drivers/logger");
 // Start the server
 const start = () => __awaiter(this, void 0, void 0, function* () {
-    console.log(process.env.DB_ADDR);
+    logger_1.Logger.info(process.env.DB_ADDR);
     try {
-        yield database_1.default.sync();
-        console.log('Connection to DB has been established successfully.');
+        yield database_1.default.raw('select 1+1 as result');
+        logger_1.Logger.info('Connection to DB has been established successfully.');
     }
     catch (err) {
-        console.error('Unable to connect to the database:', err);
+        logger_1.Logger.info('Unable to connect to the database:', err);
     }
     try {
         const server = new server_1.default();
@@ -33,7 +34,7 @@ const start = () => __awaiter(this, void 0, void 0, function* () {
         console.log('Server running at port:', server.listen(3000));
     }
     catch (err) {
-        console.log(err);
+        logger_1.Logger.info(err);
         process.exit(1);
     }
 });

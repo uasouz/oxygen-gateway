@@ -2,6 +2,7 @@ import {App, TemplatedApp} from "uWebSockets.js";
 import {createMessage, Message, validateMessage} from "./message";
 import {eventProcessor} from "./event_processor"
 import {AuthenticateUserWS, ChangeUserStatus} from "../../interface_adapters/controllers/WebsocketUserStatusController";
+import {Logger} from "../logger";
 
 export default class uWsServer {
     public app: TemplatedApp;
@@ -16,7 +17,9 @@ export default class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                AuthenticateUserWS(ws,req)
+                if(AuthenticateUserWS(ws,req)){
+
+                }
             },
             message: (ws, data, isBinary) => {
                 const message = JSON.parse(this.decoder.decode(data)) as Message;
@@ -28,10 +31,10 @@ export default class uWsServer {
             },
 
             drain: (ws) => {
-                console.log('WebSocket backpressure: ' + ws.getBufferedAmount());
+                Logger.warn('WebSocket backpressure: ' + ws.getBufferedAmount());
             },
             close: (ws, code, message) => {
-                console.log('WebSocket closed');
+                Logger.info('WebSocket closed');
             }
         });
     }
@@ -49,9 +52,9 @@ export default class uWsServer {
     listen(port: number) {
         this.app.listen(port, (token) => {
             if (token) {
-                console.log('Listening to port ' + port);
+                Logger.info('Listening to port ' + port);
             } else {
-                console.log('Failed to listen to port ' + port);
+                Logger.info('Failed to listen to port ' + port);
             }
         })
     }

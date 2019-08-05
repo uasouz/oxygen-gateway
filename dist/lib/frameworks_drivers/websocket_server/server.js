@@ -4,6 +4,7 @@ const uWebSockets_js_1 = require("uWebSockets.js");
 const message_1 = require("./message");
 const event_processor_1 = require("./event_processor");
 const WebsocketUserStatusController_1 = require("../../interface_adapters/controllers/WebsocketUserStatusController");
+const logger_1 = require("../logger");
 class uWsServer {
     constructor() {
         this.decoder = new TextDecoder("utf-8");
@@ -15,7 +16,8 @@ class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                WebsocketUserStatusController_1.AuthenticateUserWS(ws, req);
+                if (WebsocketUserStatusController_1.AuthenticateUserWS(ws, req)) {
+                }
             },
             message: (ws, data, isBinary) => {
                 const message = JSON.parse(this.decoder.decode(data));
@@ -27,10 +29,10 @@ class uWsServer {
                 }
             },
             drain: (ws) => {
-                console.log('WebSocket backpressure: ' + ws.getBufferedAmount());
+                logger_1.Logger.warn('WebSocket backpressure: ' + ws.getBufferedAmount());
             },
             close: (ws, code, message) => {
-                console.log('WebSocket closed');
+                logger_1.Logger.info('WebSocket closed');
             }
         });
     }
@@ -45,10 +47,10 @@ class uWsServer {
     listen(port) {
         this.app.listen(port, (token) => {
             if (token) {
-                console.log('Listening to port ' + port);
+                logger_1.Logger.info('Listening to port ' + port);
             }
             else {
-                console.log('Failed to listen to port ' + port);
+                logger_1.Logger.info('Failed to listen to port ' + port);
             }
         });
     }

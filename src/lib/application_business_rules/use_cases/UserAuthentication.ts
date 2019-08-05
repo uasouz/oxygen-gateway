@@ -2,7 +2,6 @@
 import * as fs from "fs";
 import * as bcrypt from "bcrypt";
 import {IUserRepository} from "../repositories/UserRepository";
-import {Op} from "sequelize";
 import {getError} from "../../enterprise_business_rules/util/errors";
 import {User} from "../../enterprise_business_rules/models/User";
 
@@ -44,7 +43,7 @@ export interface IUserLoginRequest {
 }
 
 export async function UserAuthentication(userLoginRequest: IUserLoginRequest,userRepository: IUserRepository) {
-    const user = await userRepository.FindUserWithParams({[Op.or]: [{email: userLoginRequest.email}, {username: userLoginRequest.username}]});
+    const user = await userRepository.FindUserWithParams([{email: userLoginRequest.email}, {username: userLoginRequest.username}]);
     if (!user) {
         return {authenticated: false,token:null, errors: [getError("AUTH-001")]}
     }

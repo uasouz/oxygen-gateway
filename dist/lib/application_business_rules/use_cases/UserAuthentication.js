@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const bcrypt = require("bcrypt");
-const sequelize_1 = require("sequelize");
 const errors_1 = require("../../enterprise_business_rules/util/errors");
 const { JWT, JWK } = require('@panva/jose');
 // const jose = require('@panva/jose');
@@ -40,7 +39,7 @@ function generateToken(user) {
 }
 function UserAuthentication(userLoginRequest, userRepository) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield userRepository.FindUserWithParams({ [sequelize_1.Op.or]: [{ email: userLoginRequest.email }, { username: userLoginRequest.username }] });
+        const user = yield userRepository.FindUserWithParams([{ email: userLoginRequest.email }, { username: userLoginRequest.username }]);
         if (!user) {
             return { authenticated: false, token: null, errors: [errors_1.getError("AUTH-001")] };
         }

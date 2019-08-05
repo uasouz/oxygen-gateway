@@ -1,5 +1,5 @@
 import {IUserRepository} from "../repositories/UserRepository";
-import {pipeP} from "ramda";
+import {pipeP,when} from "ramda";
 import {getError} from "../../enterprise_business_rules/util/errors";
 
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();

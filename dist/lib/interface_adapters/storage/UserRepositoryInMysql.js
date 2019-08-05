@@ -8,26 +8,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const users_1 = require("../../frameworks_drivers/database/users");
+const database_1 = require("../../frameworks_drivers/database");
+const User_1 = require("../../enterprise_business_rules/models/User");
 class UserRepositoryInMysql {
     CountUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_1.User.count();
+            const result = yield database_1.default('users').count({ count: '*' });
+            return result.count;
         });
     }
     CountUserWithParams(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_1.User.count({ where: params });
+            const result = yield database_1.default('users').where(params).count({ count: '*' });
+            return result.count;
         });
     }
+    //Pass array for or conditions
     FindUserWithParams(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_1.User.findOne({ where: params });
+            let result = database_1.default('users');
+            if (Array.isArray(params)) {
+                params.forEach((value) => {
+                    result = result.orWhere(value);
+                });
+            }
+            else {
+                result = result.where(params);
+            }
+            return User_1.User.serialize(yield result);
         });
     }
     AddNewUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_1.User.create(user);
+            const result = yield database_1.default('users').insert(user, ["*"]);
+            return User_1.User.serialize(result);
         });
     }
 }
