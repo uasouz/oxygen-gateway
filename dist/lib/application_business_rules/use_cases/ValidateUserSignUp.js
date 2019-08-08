@@ -66,11 +66,13 @@ const userValidator = ramda_1.pipeP(emailAbleToRegister, validateCellphone);
 function ValidateUserSignUp({ userRegistration, errors, userRepository }) {
     return __awaiter(this, void 0, void 0, function* () {
         const userValidation = yield userValidator({ userRegistration, errors, userRepository });
-        return when_1.when(userValidation.errors.length).is((length) => {
+        return when_1.when(userValidation.errors.length)
+            .is((length) => {
             return length > 0;
         }, () => {
             return { isValid: false, errors: userValidation.errors };
-        }).otherwise(() => {
+        })
+            .otherwise(() => {
             return { isValid: true, errors: userValidation.errors };
         });
     });

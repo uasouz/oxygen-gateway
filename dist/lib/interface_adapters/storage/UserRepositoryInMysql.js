@@ -41,7 +41,7 @@ class UserRepositoryInMysql {
     AddNewUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield database_1.default('users').insert(user, ["*"]);
-            return User_1.User.serialize(this.FindUserWithParams({ id: result[0] }));
+            return this.FindUserWithParams({ id: result[0] });
         });
     }
 }
