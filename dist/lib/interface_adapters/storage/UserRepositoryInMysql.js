@@ -14,13 +14,13 @@ class UserRepositoryInMysql {
     CountUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield database_1.default('users').count({ count: '*' });
-            return result.count;
+            return result[0].count;
         });
     }
     CountUserWithParams(params) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield database_1.default('users').where(params).count({ count: '*' });
-            return result.count;
+            return result[0].count;
         });
     }
     //Pass array for or conditions
@@ -41,7 +41,7 @@ class UserRepositoryInMysql {
     AddNewUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield database_1.default('users').insert(user, ["*"]);
-            return User_1.User.serialize(result);
+            return User_1.User.serialize(this.FindUserWithParams({ id: result[0] }));
         });
     }
 }

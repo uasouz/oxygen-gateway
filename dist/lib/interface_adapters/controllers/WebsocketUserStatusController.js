@@ -4,6 +4,7 @@ const message_1 = require("../../frameworks_drivers/websocket_server/message");
 const logger_1 = require("../../frameworks_drivers/logger");
 const querystring = require("querystring");
 const ValdiateUserToken_1 = require("../../application_business_rules/use_cases/ValdiateUserToken");
+const client_1 = require("../../frameworks_drivers/redis/client");
 function getTokenFromQueryString(query) {
     const queryValues = querystring.parse(query);
     if (queryValues.token != null && queryValues.token != "") {
@@ -18,6 +19,7 @@ function AuthenticateUserWS(ws, request) {
         ws.close();
         return false;
     }
+    client_1.RedisService.redis.set(JWTVerify.data.sub, JSON.stringify({ status: "ONLINE" }));
     ws.send(message_1.createMessage(null, "Welcome").toString());
     return true;
 }

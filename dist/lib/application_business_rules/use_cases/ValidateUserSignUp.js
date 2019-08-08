@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ramda_1 = require("ramda");
 const errors_1 = require("../../enterprise_business_rules/util/errors");
+const when_1 = require("../../util/when");
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 const validateEmail = (email) => {
     const validationRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -65,10 +66,13 @@ const userValidator = ramda_1.pipeP(emailAbleToRegister, validateCellphone);
 function ValidateUserSignUp({ userRegistration, errors, userRepository }) {
     return __awaiter(this, void 0, void 0, function* () {
         const userValidation = yield userValidator({ userRegistration, errors, userRepository });
-        if (userValidation.errors.length > 0) {
+        return when_1.when(userValidation.errors.length).is((length) => {
+            return length > 0;
+        }, () => {
             return { isValid: false, errors: userValidation.errors };
-        }
-        return { isValid: true, errors: userValidation.errors };
+        }).otherwise(() => {
+            return { isValid: true, errors: userValidation.errors };
+        });
     });
 }
 exports.ValidateUserSignUp = ValidateUserSignUp;

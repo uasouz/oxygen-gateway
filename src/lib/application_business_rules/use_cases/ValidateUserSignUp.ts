@@ -1,6 +1,7 @@
 import {IUserRepository} from "../repositories/UserRepository";
-import {pipeP,when} from "ramda";
+import {pipeP} from "ramda";
 import {getError} from "../../enterprise_business_rules/util/errors";
+import {when} from "../../util/when";
 
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 
@@ -18,7 +19,7 @@ function validatePhone(telefone: string) {
     try {
         const number = phoneUtil.parseAndKeepRawInput(telefone, 'BR');
         return phoneUtil.isValidNumber(number)
-    }catch (e) {
+    } catch (e) {
         return false
     }
 }
@@ -71,11 +72,15 @@ async function validateCellphone({userRegistration, errors, userRepository}: Use
 const userValidator = pipeP(emailAbleToRegister, validateCellphone);
 
 
-
 export async function ValidateUserSignUp({userRegistration, errors, userRepository}: UserValidationPayload) {
     const userValidation = await userValidator({userRegistration, errors, userRepository});
-    if (userValidation.errors.length > 0) {
-        return {isValid: false , errors: userValidation.errors}
-    }
-    return {isValid: true , errors: userValidation.errors}
+    return when(userValidation.errors.length)
+        .is((length) => {
+            return length > 0
+        }, () => {
+            return {isValid: false, errors: userValidation.errors}
+        })
+        .otherwise(() => {
+            return {isValid: true, errors: userValidation.errors}
+        })
 }

@@ -6,5 +6,4 @@ class RedisClient {
         this.redis = new Redis({port: 6379, host: process.env.REDIS_ADDR});
     }
 }
-
-module.exports = new RedisClient();
+export const RedisService = new RedisClient();

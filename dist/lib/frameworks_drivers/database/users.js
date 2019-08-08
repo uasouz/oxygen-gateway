@@ -14,6 +14,7 @@ function setupDatabase(database) {
         if (!hasTableUsers) {
             yield database.schema.createTable("users", (table) => {
                 table.increments();
+                table.binary("uuid", 16).notNullable().unique();
                 table.string("username", 60).notNullable();
                 table.string("password", 60).notNullable();
                 table.string("email", 255).notNullable().unique();
