@@ -18,8 +18,7 @@ function login(req, res) {
         const userAuthentication = yield UserAuthentication_1.UserAuthentication(userLoginRequet, UserRepositoryInMysql_1.userRepository);
         userAuthentication.cata(err => () => {
             response_1.BaseResponse.Fail(res, err.errors);
-        }, authentication => () => {
-            // @ts-ignore
+        }, (authentication) => () => {
             return response_1.BaseResponse.Succeed(res, { token: authentication.token });
         })();
     });

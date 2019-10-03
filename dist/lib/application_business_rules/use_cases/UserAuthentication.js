@@ -48,23 +48,23 @@ function generateToken(user) {
 function UserAuthentication(userLoginRequest, userRepository) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = yield userRepository.FindUserWithParams([{ email: userLoginRequest.email }, { username: userLoginRequest.username }]);
-        return user.flatMap(userData => userData ? monet_1.Right(userData) : monet_1.Left({ authenticated: false, token: null, errors: [errors_1.getError("AUTH-001")] }))
+        return user
+            .flatMap(userData => userData ? monet_1.Right(userData) : monet_1.Left({
+            authenticated: false,
+            token: null,
+            errors: [errors_1.getError("AUTH-001")]
+        }))
             .flatMap((data) => {
             return validateUserPassword(userLoginRequest.password, data.password) ?
                 monet_1.Right(data) :
                 monet_1.Left({ authenticated: false, token: null, errors: [errors_1.getError("AUTH-002")] });
-        }).flatMap((data) => {
+        })
+            .flatMap((data) => {
             return generateToken(data);
-        }).flatMap((token) => {
+        })
+            .flatMap((token) => {
             return token ? monet_1.Right({ authenticated: true, token, errors: [] }) : monet_1.Left(new Error("Null Token"));
         });
-        //     .cata(err => () => {
-        //     Logger.info(err);
-        //     return err
-        // }, (token: string) => () => {
-        //     return token
-        // })();
-        // return {authenticated: true, token, errors: []}
     });
 }
 exports.UserAuthentication = UserAuthentication;

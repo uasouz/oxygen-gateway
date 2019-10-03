@@ -51,15 +51,21 @@ export interface IUserLoginRequest {
 
 export async function UserAuthentication(userLoginRequest: IUserLoginRequest, userRepository: IUserRepository) {
     const user = await userRepository.FindUserWithParams([{email: userLoginRequest.email}, {username: userLoginRequest.username}]);
-    return user.flatMap<User>(userData=> userData? Right(userData as User): Left({authenticated: false, token: null, errors: [getError("AUTH-001")]}))
+    return user
+        .flatMap<User>(userData => userData ? Right(userData as User) : Left({
+            authenticated: false,
+            token: null,
+            errors: [getError("AUTH-001")]
+        }))
         .flatMap<User>((data) => {
-            return validateUserPassword(userLoginRequest.password, data.password) ?
-                Right(data) :
-                Left({authenticated: false, token: null, errors: [getError("AUTH-002")]})
-        }
-    ).flatMap((data: User) => {
-        return generateToken(data)
-    }).flatMap((token: string)=>{
-        return token ? Right({authenticated: true, token, errors: []}): Left(new Error("Null Token"))
-    });
+                return validateUserPassword(userLoginRequest.password, data.password) ?
+                    Right(data) :
+                    Left({authenticated: false, token: null, errors: [getError("AUTH-002")]})
+            })
+        .flatMap((data: User) => {
+            return generateToken(data)
+        })
+        .flatMap((token: string) => {
+            return token ? Right({authenticated: true, token, errors: []}) : Left(new Error("Null Token"))
+        });
 }

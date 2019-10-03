@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+//Transform to serializer(?)
 class Message {
     constructor(data, event, status) {
         this.data = data;
