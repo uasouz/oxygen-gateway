@@ -6,6 +6,7 @@ import {ValidateUserToken} from "../../application_business_rules/use_cases/Vald
 import {RedisService} from "../../frameworks_drivers/redis/client";
 import {UserStatus} from "../../enterprise_business_rules/models/UserStatus";
 import {ValidateUserStatus} from "../../application_business_rules/use_cases/ValidateUserStatus";
+import {Events} from "../../frameworks_drivers/websocket_server/events";
 
 function getTokenFromQueryString(query: string) {
     const queryValues = querystring.parse(query);
@@ -19,12 +20,12 @@ function getTokenFromQueryString(query: string) {
 export function Identify(ws: WebSocket, request: HttpRequest) {
     const JWTVerify = ValidateUserToken(getTokenFromQueryString(request.getQuery()));
     if (!JWTVerify.isValid) {
-        ws.send(createMessage(JWTVerify.error, "FailedAuthentication", "Failed").toString());
+        ws.send(createMessage(JWTVerify.error, Events.InvalidSession, "Failed").toString());
         ws.close();
         return {isValid: false, data: null}
     }
     RedisService.redis.set(JWTVerify.data.sub, JSON.stringify({status: UserStatus.ONLINE}));
-    ws.send(createMessage(null, "Welcome").toString());
+    ws.send(createMessage(null, Events.Hello).toString(),);
     return {isValid: true, data: JWTVerify.data}
 }
 
@@ -37,13 +38,13 @@ export function UpdateStatus(ws: WebSocket, message: Message) {
     if(ValidateUserStatus(message.data.status)) {
         RedisService.redis.set(ws.userData.sub, JSON.stringify({status: message.data.status})).then((result) => {
             if (result == "OK") {
-                ws.send(createMessage({message: "Changing User Status to " + UserStatus[message.data.status]}, message.event).toString())
+                ws.send(createMessage({message: "Changing User Status to " + UserStatus[message.data.status]}, Events.PresenceUpdate).toString())
             } else {
-                ws.send(createMessage({message: "Failed to change user status"}, message.event, "Failed").toString())
+                ws.send(createMessage({message: "Failed to change user status"}, Events.PresenceUpdate, "Failed").toString())
             }
         });
     } else {
-        ws.send(createMessage({message: "Invalid Status"}, message.event, "Failed").toString())
+        ws.send(createMessage({message: "Invalid Status"}, Events.PresenceUpdate, "Failed").toString())
     }
 }
 
