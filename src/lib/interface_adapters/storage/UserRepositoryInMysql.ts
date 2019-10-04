@@ -29,7 +29,7 @@ class UserRepositoryInMysql implements IUserRepository {
 
     async AddNewUser(user: { password: any; phone: string; email: string; username: string }) {
         const result = await database('users').insert(user, ["*"]);
-        return User.serialize(this.FindUserWithParams({id: result[0]}))
+        return this.FindUserWithParams({id: result[0]})
     }
 
 }

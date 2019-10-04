@@ -1,7 +1,11 @@
 import {App, TemplatedApp} from "uWebSockets.js";
 import {createMessage, Message, validateMessage} from "./message";
 import {eventProcessor} from "./event_processor"
-import {AuthenticateUserWS, ChangeUserStatus} from "../../interface_adapters/controllers/WebsocketUserStatusController";
+import {
+    Identify,
+    UpdateStatus,
+    SetUserStatusOffline
+} from "../../interface_adapters/controllers/WebsocketUserStatusController";
 import {Logger} from "../logger";
 
 export default class uWsServer {
@@ -17,8 +21,9 @@ export default class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                if(AuthenticateUserWS(ws,req)){
-
+                const Identity = Identify(ws, req);
+                if (Identity.isValid) {
+                    ws.userData = Identity.data
                 }
             },
             message: (ws, data, isBinary) => {
@@ -26,7 +31,10 @@ export default class uWsServer {
                 if (message && validateMessage(message)) {
                     eventProcessor.processEvent(ws, message.event, message)
                 } else {
-                    ws.send(createMessage({success: false, error: "invalid body"}, 'InvalidMessage',"Failed").toString())
+                    ws.send(createMessage({
+                        success: false,
+                        error: "invalid body"
+                    }, 'InvalidMessage', "Failed").toString())
                 }
             },
 
@@ -34,13 +42,14 @@ export default class uWsServer {
                 Logger.warn('WebSocket backpressure: ' + ws.getBufferedAmount());
             },
             close: (ws, code, message) => {
+                SetUserStatusOffline(ws);
                 Logger.info('WebSocket closed');
             }
         });
     }
 
     initializeHandlers() {
-        eventProcessor.addEventHandler(ChangeUserStatus)
+        eventProcessor.addEventHandler(UpdateStatus)
     }
 
     registerRoutes() {

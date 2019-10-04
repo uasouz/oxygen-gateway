@@ -1,4 +1,5 @@
 import {fromBinaryUUID} from "../../util/binary-uuid/binary-uuid";
+import {Either, Left, Right} from "monet";
 
 export class User {
     public id?: number;
@@ -30,13 +31,14 @@ export class User {
         };
     }
 
-    static serialize(data: object) {
+    static serialize(data: object): Either<Error,User> {
         if (!data) {
-            throw new Error('Expect data to be not undefined nor null');
+            return Left(new Error('Expect data to be not undefined nor null'));
         }
         if (Array.isArray(data)) {
-            return data.map(this.serializeSingleUser)[0];
+            const user = data.map(this.serializeSingleUser)[0]
+            return user ? Right(data.map(this.serializeSingleUser)[0]) : Left(new Error('Expected User'))
         }
-        return this.serializeSingleUser(data)
+        return Right(this.serializeSingleUser(data))
     }
 }

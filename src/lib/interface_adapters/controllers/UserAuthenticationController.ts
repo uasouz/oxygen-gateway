@@ -9,8 +9,9 @@ import {UserLoginRequest} from "../serializers/UserLoginRequest";
 export async function login(req: Request, res: Response) {
     const userLoginRequet = UserLoginRequest.serialize(req.body);
     const userAuthentication = await UserAuthentication(userLoginRequet, userRepository);
-    if (!userAuthentication.authenticated) {
-        return BaseResponse.Fail(res, userAuthentication.errors)
-    }
-    return BaseResponse.Succeed(res, {token: userAuthentication.token})
+    userAuthentication.cata(err => () => {
+        BaseResponse.Fail(res, err.errors)
+    },(authentication: any) => () =>{
+        return BaseResponse.Succeed(res, {token: authentication.token})
+    })();
 }

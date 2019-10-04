@@ -16,7 +16,9 @@ class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                if (WebsocketUserStatusController_1.AuthenticateUserWS(ws, req)) {
+                const Authentication = WebsocketUserStatusController_1.AuthenticateUserWS(ws, req);
+                if (Authentication.isValid) {
+                    ws.userData = Authentication.data;
                 }
             },
             message: (ws, data, isBinary) => {
@@ -25,13 +27,17 @@ class uWsServer {
                     event_processor_1.eventProcessor.processEvent(ws, message.event, message);
                 }
                 else {
-                    ws.send(message_1.createMessage({ success: false, error: "invalid body" }, 'InvalidMessage', "Failed").toString());
+                    ws.send(message_1.createMessage({
+                        success: false,
+                        error: "invalid body"
+                    }, 'InvalidMessage', "Failed").toString());
                 }
             },
             drain: (ws) => {
                 logger_1.Logger.warn('WebSocket backpressure: ' + ws.getBufferedAmount());
             },
             close: (ws, code, message) => {
+                WebsocketUserStatusController_1.SetUserStatusOffline(ws);
                 logger_1.Logger.info('WebSocket closed');
             }
         });

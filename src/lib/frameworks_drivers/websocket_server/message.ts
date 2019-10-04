@@ -1,3 +1,4 @@
+//Transform to serializer(?)
 export class Message {
 
     constructor(

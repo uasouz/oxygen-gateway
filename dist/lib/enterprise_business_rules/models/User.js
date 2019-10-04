@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const binary_uuid_1 = require("../../util/binary-uuid/binary-uuid");
+const monet_1 = require("monet");
 class User {
     static serializeSingleUser(user) {
         return {
@@ -19,12 +20,13 @@ class User {
     }
     static serialize(data) {
         if (!data) {
-            throw new Error('Expect data to be not undefined nor null');
+            return monet_1.Left(new Error('Expect data to be not undefined nor null'));
         }
         if (Array.isArray(data)) {
-            return data.map(this.serializeSingleUser)[0];
+            const user = data.map(this.serializeSingleUser)[0];
+            return user ? monet_1.Right(data.map(this.serializeSingleUser)[0]) : monet_1.Left(new Error('Expected User'));
         }
-        return this.serializeSingleUser(data);
+        return monet_1.Right(this.serializeSingleUser(data));
     }
 }
 exports.User = User;

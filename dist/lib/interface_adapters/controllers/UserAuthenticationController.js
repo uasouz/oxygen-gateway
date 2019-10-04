@@ -16,10 +16,11 @@ function login(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const userLoginRequet = UserLoginRequest_1.UserLoginRequest.serialize(req.body);
         const userAuthentication = yield UserAuthentication_1.UserAuthentication(userLoginRequet, UserRepositoryInMysql_1.userRepository);
-        if (!userAuthentication.authenticated) {
-            return response_1.BaseResponse.Fail(res, userAuthentication.errors);
-        }
-        return response_1.BaseResponse.Succeed(res, { token: userAuthentication.token });
+        userAuthentication.cata(err => () => {
+            response_1.BaseResponse.Fail(res, err.errors);
+        }, (authentication) => () => {
+            return response_1.BaseResponse.Succeed(res, { token: authentication.token });
+        })();
     });
 }
 exports.login = login;
