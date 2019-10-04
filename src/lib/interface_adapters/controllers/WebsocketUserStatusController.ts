@@ -16,7 +16,7 @@ function getTokenFromQueryString(query: string) {
 }
 
 //Authenticate user on websocket server
-export function AuthenticateUserWS(ws: WebSocket, request: HttpRequest) {
+export function Identify(ws: WebSocket, request: HttpRequest) {
     const JWTVerify = ValidateUserToken(getTokenFromQueryString(request.getQuery()));
     if (!JWTVerify.isValid) {
         ws.send(createMessage(JWTVerify.error, "FailedAuthentication", "Failed").toString());
@@ -33,7 +33,7 @@ export function SetUserStatusOffline(ws:WebSocket){
 }
 
 //Set user status at Gateway
-export function ChangeUserStatus(ws: WebSocket, message: Message) {
+export function UpdateStatus(ws: WebSocket, message: Message) {
     if(ValidateUserStatus(message.data.status)) {
         RedisService.redis.set(ws.userData.sub, JSON.stringify({status: message.data.status})).then((result) => {
             if (result == "OK") {
@@ -47,7 +47,15 @@ export function ChangeUserStatus(ws: WebSocket, message: Message) {
     }
 }
 
+export function UpdateVoiceStatus(ws: WebSocket, message: Message) {
+
+}
+
 export function GetUserGuilds(ws: WebSocket, message: Message){
+
+}
+
+export function RequestGuildMembers(ws: WebSocket, message: Message) {
 
 }
 

@@ -2,8 +2,8 @@ import {App, TemplatedApp} from "uWebSockets.js";
 import {createMessage, Message, validateMessage} from "./message";
 import {eventProcessor} from "./event_processor"
 import {
-    AuthenticateUserWS,
-    ChangeUserStatus,
+    Identify,
+    UpdateStatus,
     SetUserStatusOffline
 } from "../../interface_adapters/controllers/WebsocketUserStatusController";
 import {Logger} from "../logger";
@@ -21,9 +21,9 @@ export default class uWsServer {
             idleTimeout: 30,
             /* Handlers */
             open: (ws, req) => {
-                const Authentication = AuthenticateUserWS(ws, req);
-                if (Authentication.isValid) {
-                    ws.userData = Authentication.data
+                const Identity = Identify(ws, req);
+                if (Identity.isValid) {
+                    ws.userData = Identity.data
                 }
             },
             message: (ws, data, isBinary) => {
@@ -49,7 +49,7 @@ export default class uWsServer {
     }
 
     initializeHandlers() {
-        eventProcessor.addEventHandler(ChangeUserStatus)
+        eventProcessor.addEventHandler(UpdateStatus)
     }
 
     registerRoutes() {
